@@ -1,0 +1,52 @@
+<style>
+em { color:red; font-weight: bold; font-style: normal; }
+  .twitter-typeahead, .twitter-typeahead .tt-input { width: 100%; }
+.twitter-typeahead .tt-input, .twitter-typeahead .tt-hint { width: 100%; margin: 0px; padding: 8px 12px; border: 2px solid #ccc; outline: none; }
+.twitter-typeahead .tt-input:focus { border: 2px solid #0097cf; }
+.twitter-typeahead .tt-hint { color: #999; }
+.twitter-typeahead .tt-dropdown-menu { width: 100%; padding: 0; background-color: #fff; border: 1px solid rgba(0, 0, 0, 0.2); border-top: 0px;
+.twitter-typeahead .tt-dropdown-menu .tt-suggestion { text-align: left; padding: 3px 20px; font-size: 18px; line-height: 24px; }
+.twitter-typeahead .tt-dropdown-menu .tt-suggestion.tt-cursor { color: #fff; background-color: #0097cf; }
+.twitter-typeahead .tt-dropdown-menu .tt-suggestion em { font-weight: bold; font-style: normal; }
+</style>
+
+<div class="row">
+  <div class="col-sm-6 col-sm-offset-3">
+    <div class="input-group">
+      <input class="form-control" type="text" id="query" autocomplete="off" spellcheck="false" autocapitalize="off"></input>
+      <span class="input-group-addon">
+        <i class="glyphicon glyphicon-search"></i>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- JQuery -->
+<script src="//cdn.jsdelivr.net/jquery/1.11.1/jquery.min.js"></script>
+<!-- Typahead.js is used to display the auto-completion menu -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.4/typeahead.bundle.min.js"></script>
+<!-- Algolia -->
+<script src="//cdn.jsdelivr.net/algoliasearch/latest/algoliasearch.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    var algolia = new AlgoliaSearch('<%= ENV['ALGOLIASEARCH_APPLICATION_ID'] %>', '<%= ENV['ALGOLIASEARCH_API_KEY_SEARCH_ONLY'] %>');
+    var index = algolia.initIndex('Ad');
+
+    // typeahead.js initialization
+    $('#query').typeahead({ hint: false }, {
+      source: index.ttAdapter({ hitsPerPage: 5 }),
+      displayKey: 'title',
+      templates: {
+        suggestion: function(hit) {
+          // render the hit
+          return '<div class="hit">' +
+            '<div class="title">' +
+              hit._highlightResult.title.value + ' ' +
+              '(' + hit._highlightResult.location.value + ')' +
+            '</div>' +
+          '</div>';
+        }
+      }
+    });
+  });
+</script>
